@@ -13,7 +13,7 @@ class WelcomeScreen extends StatelessWidget {
         child: Column(
           children: [
             Image.asset(
-              "assets/img-3.png",
+              "assets/z1.jpeg",
               height: MediaQuery.of(context).size.height * 0.55,
               width: MediaQuery.of(context).size.width,
               fit: BoxFit.cover,
@@ -101,7 +101,7 @@ class WelcomeScreen extends StatelessWidget {
               child: const Text(
                 "Continue as a guest",
                 style: TextStyle(
-                  color: Color(0xFF35C2C1),
+                  color: const Color(0xFF1E232C),
                 ),
               ),
             ),

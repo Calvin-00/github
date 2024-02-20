@@ -16,8 +16,7 @@ class RegisterScreen extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
           children: [
             const SizedBox(height: 20),
             Padding(
@@ -159,6 +158,7 @@ class RegisterScreen extends StatelessWidget {
                 ),
               ),
             ),
+
             const SizedBox(height: 25),
             //register button
             Padding(
@@ -282,7 +282,9 @@ class RegisterScreen extends StatelessWidget {
                 ],
               ),
             ),
+
             const Spacer(),
+            // Already have an account? Login
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -296,9 +298,11 @@ class RegisterScreen extends StatelessWidget {
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginScreen()));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginScreen(),
+                      ),
+                    );
                   },
                   child: const Text(
                     "Login",
