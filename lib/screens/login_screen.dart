@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:github/Home_Page.dart';
+import 'package:github/api/google_signin_api.dart';
 import 'package:github/screens/forgot_password_screen.dart';
 import 'package:github/screens/register_screen.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -11,6 +13,18 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+
+  googleLogin() async {
+    print("Google Login method called");
+
+    GoogleSignIn _googleSignIn = GoogleSignIn();
+    try {
+      var res = await _googleSignIn.signIn();
+      print(res);
+    } catch (e) {
+      print(e);
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,10 +163,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => HomeScreen()));
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) => HomeScreen( user: success)));
                       },
                       child: const Padding(
                         padding: EdgeInsets.all(15.0),
@@ -224,22 +238,29 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color(0xFFE8ECF4),
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Image.asset(
-                          "assets/google.png",
-                          height: 32,
-                        ),
-                      ),
-                    ),
-                  ),
+  child: GestureDetector(
+    onTap: () {
+      // Call the signIn function when the Google logo is tapped
+      signIn(context);
+    },
+    child: Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: const Color(0xFFE8ECF4),
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Image.asset(
+          "assets/google.png",
+          height: 32,
+        ),
+      ),
+    ),
+  ),
+),
+
                   const SizedBox(width: 10),
                   Expanded(
                     child: Container(
@@ -296,3 +317,32 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
+// Future signIn() async {
+//   await GoogleSignInApi.login();
+// }
+
+Future signIn(BuildContext context) async {
+  // Perform the Google sign-in
+  GoogleSignInAccount? success = await GoogleSignInApi.login();
+
+  // Check if the sign-in was successful
+  if (success != null) {
+    // Navigate to the HomeScreen
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (context) => HomeScreen(
+                user: success,
+              )),
+    );
+  } else {
+    // Handle unsuccessful sign-in if needed
+    print("Sign-in unsuccessful");
+  }
+}
+
+Future<void> googleLogout() async {
+  await GoogleSignInApi.logout();
+}
+

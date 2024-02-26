@@ -1,116 +1,37 @@
 import 'dart:async';
-import 'package:flutter_offline/flutter_offline.dart';
-// import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
-
-
 import 'calculator_screen.dart';
 import 'drawer_navigation.dart';
 import 'theme_provider.dart';
 
-
-
-
-// class Home extends StatefulWidget {
-//   const Home({super.key});
-
-//   @override
-//   State<Home> createState() => _HomeState();
-// }
-
-// class _HomeState extends State<Home> {
-//   int currentindex=0;
-//   final screens=[const Home_Screen(),const Call_Calculator(),const About_Screen()];
-//   List<String> screentitle=['Home','Calculator','About'];
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         elevation: 0,
-//         backgroundColor: Colors.blueGrey,
-//         title:  Text(
-//           screentitle[currentindex],
-//           // 'Home',
-//             style: const TextStyle(
-//                 fontSize: 30,
-//                 fontWeight: FontWeight.bold,
-//                 color: Colors.white)),
-
-//                 actions: [
-//           IconButton(
-//             onPressed: () {
-//               context.read<ThemeStateProvider>().setDarkTheme();
-//             },
-//             icon:
-//                 context.select((ThemeStateProvider theme) => theme.isDarkTheme)
-//                     ? const Icon(Icons.dark_mode_outlined)
-//                     : const Icon(Icons.light_mode_outlined),
-//           ),
-//         ],
-//       ),
-//       drawer: NavBar(),
-//       bottomNavigationBar: BottomNavigationBar(
-//         backgroundColor: Colors.red,
-//         type: BottomNavigationBarType.shifting,
-//         fixedColor: Colors.black,//if it is shifting
-//         iconSize: 30,
-//         currentIndex: currentindex,
-//         landscapeLayout: BottomNavigationBarLandscapeLayout.spread,
-//         onTap: (value) {
-//   setState(() {
-//     currentindex = value;
-//   });
-
-//   // Add logic to navigate to the Calculator screen
-//   if (currentindex == 1) {
-//     Navigator.push(context, MaterialPageRoute(builder: (context) => Call_Calculator()));
-//   }
-// },
-
-//         items: const[
-//         BottomNavigationBarItem(backgroundColor: Colors.blueGrey, icon: Icon(Icons.home),label: 'Home'),
-//         BottomNavigationBarItem(backgroundColor: Colors.blueGrey, icon: Icon(Icons.calculate),label: 'Calculator'),
-//         BottomNavigationBarItem(backgroundColor: Colors.blueGrey, icon: Icon(Icons.info),label: 'About'),
-//       ]),
-//       body: IndexedStack(index: currentindex,children: screens,)
-//     );
-//   }
-// }
-
-
 class HomeScreen extends StatefulWidget {
+  final GoogleSignInAccount user;
+
+  HomeScreen({required this.user});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
+
 class _HomeScreenState extends State<HomeScreen> {
-  late StreamSubscription subscription;
-  bool isDeviceConnected = false;
-  bool isAlertSet = false;
+  late StreamSubscription _subscription;
+  bool _isDeviceConnected = false;
+  bool _isAlertSet = false;
 
   @override
   void initState() {
+    // Call getConnectivity in initState if needed
     // getConnectivity();
     super.initState();
   }
 
-  // getConnectivity() =>
-  //     subscription = Connectivity().onConnectivityChanged.listen(
-  //       (ConnectivityResult result) async {
-  //         isDeviceConnected = await InternetConnectionChecker().hasConnection;
-  //         if (!isDeviceConnected && isAlertSet == false) {
-  //           showDialogBox();
-  //           setState(() => isAlertSet = true);
-  //         }
-  //       },
-  //     );
-
   @override
   void dispose() {
-    subscription.cancel();
+    // Cancel the subscription in dispose
+    _subscription.cancel();
     super.dispose();
   }
 
@@ -124,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // List of titles for the AppBar based on the tab index
   final List<String> _appBarTitles = ['Home', 'Calculator', 'About'];
 
-  void _onTabSelected(int index) {
+  void _onTabSelected(int index, BuildContext context) {
     setState(() {
       _selectedIndex = index;
     });
@@ -140,17 +61,16 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {
               context.read<ThemeStateProvider>().setDarkTheme();
             },
-            icon:
-                context.select((ThemeStateProvider theme) => theme.isDarkTheme)
-                    ? const Icon(Icons.dark_mode_outlined)
-                    : const Icon(Icons.light_mode_outlined),
+            icon: context.select((ThemeStateProvider theme) => theme.isDarkTheme)
+                ? const Icon(Icons.dark_mode_outlined)
+                : const Icon(Icons.light_mode_outlined),
           ),
         ],
       ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: _onTabSelected,
+        onTap: (index) => _onTabSelected(index, context),
         selectedItemColor: Colors.blueGrey,
         unselectedItemColor: Colors.grey,
         items: [
@@ -169,35 +89,14 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       drawer: DrawerNavigation(
-        onItemSelected: _onTabSelected,
-        selectedIndex: _selectedIndex, // Pass the selected index
-        context: context, // Pass the context
+        onItemSelected: (index) {
+          _onTabSelected(index, context);
+        },
+        selectedIndex: _selectedIndex,
+        user: widget.user,
       ),
     );
   }
-
-  // showDialogBox() => showCupertinoDialog<String>(
-  //       context: context,
-  //       builder: (BuildContext context) => CupertinoAlertDialog(
-  //         title: const Text('No Connection'),
-  //         content: const Text('Please check your internet connectivity'),
-  //         actions: <Widget>[
-  //           TextButton(
-  //             onPressed: () async {
-  //               Navigator.pop(context, 'Cancel');
-  //               setState(() => isAlertSet = false);
-  //               // isDeviceConnected =
-  //               //     await InternetConnectionChecker().hasConnection;
-  //               if (!isDeviceConnected && isAlertSet == false) {
-  //                 showDialogBox();
-  //                 setState(() => isAlertSet = true);
-  //               }
-  //             },
-  //             child: const Text('OK'),
-  //           ),
-  //         ],
-  //       ),
-  //     );
 }
 
 class ScreenOne extends StatelessWidget {
@@ -239,4 +138,3 @@ class ScreenThree extends StatelessWidget {
     );
   }
 }
-
